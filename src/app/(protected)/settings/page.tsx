@@ -6,7 +6,7 @@ interface SettingsPageProps {}
 const SettingsPage: React.FC<SettingsPageProps> = async ({}) => {
     const session = await auth();
 
-    console.log((session?.user as any).role);
+    console.log(session?.user);
 
     const handleLogout = async () => {
         "use server";

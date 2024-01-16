@@ -33,7 +33,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({}) => {
     const callbackUrl = searchParams.get("callbackUrl");
     const urlError =
         searchParams.get("error") === "OAuthAccountNotLinked"
-            ? "Email already in use with different provider!"
+            ? "Email already in use with a different provider!"
             : "";
 
     const [showTwoFactor, setShowTwoFactor] = useState(false);
@@ -54,6 +54,9 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({}) => {
 
     const onSubmit = async (values: z.infer<typeof RegisterSchema>) => {
         console.log("[RegisterForm]\n onSubmit() ");
+
+        setError("");
+        setSuccess("");
 
         startTransition(async () => {
             const resp = await register({

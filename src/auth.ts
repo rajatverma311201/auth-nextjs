@@ -16,6 +16,15 @@ export const {
     signIn,
     signOut,
 } = NextAuth({
+    pages: {
+        signIn: "/auth/login",
+        error: "/auth/error",
+    },
+
+    events: {
+        linkAccount: async ({ user }) => linkAccountEvent({ user }),
+    },
+
     callbacks: {
         signIn: ({ user, account }) => signInCB({ user, account }),
 
@@ -31,14 +40,21 @@ export const {
     ...authConfig,
 });
 
+interface LinkAccountEventProps {
+    user: User;
+}
+const linkAccountEvent = async ({ user }: LinkAccountEventProps) => {
+    await db.user.update({
+        where: { id: user.id },
+        data: { emailVerified: new Date() },
+    });
+};
+
 interface SignInCBProps {
     user: User;
     account: Account | null;
 }
 const signInCB = async ({ user, account }: SignInCBProps) => {
-    console.log("[signInCB]", { user });
-    console.log("[signInCB]", { account });
-
     if (account?.provider !== "credentials") return true;
 
     const existingUser = await getUserById(user.id);

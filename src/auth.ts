@@ -1,0 +1,82 @@
+import NextAuth from "next-auth";
+
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import { type UserRole } from "@prisma/client";
+import { type JWT } from "@auth/core/jwt";
+import { type User, type Session, Account } from "next-auth/types";
+
+import authConfig from "@/auth.config";
+import { getUserById } from "@/data/user";
+
+import { db } from "@/lib/db";
+
+export const {
+    handlers: { GET, POST },
+    auth,
+    signIn,
+    signOut,
+} = NextAuth({
+    callbacks: {
+        signIn: ({ user, account }) => signInCB({ user, account }),
+
+        session: ({ token, session }) => sessionCB({ token, session }),
+
+        jwt: ({ token }) => jwtCB({ token }),
+    },
+
+    adapter: PrismaAdapter(db),
+
+    session: { strategy: "jwt" },
+
+    ...authConfig,
+});
+
+interface SignInCBProps {
+    user: User;
+    account: Account | null;
+}
+const signInCB = async ({ user, account }: SignInCBProps) => {
+    console.log("[signInCB]", { user });
+    console.log("[signInCB]", { account });
+
+    if (account?.provider !== "credentials") return true;
+
+    const existingUser = await getUserById(user.id);
+
+    if (!existingUser || !existingUser.emailVerified) {
+        return false;
+    }
+
+    return true;
+};
+
+interface JWTProps {
+    token: JWT;
+}
+const jwtCB = async ({ token }: JWTProps) => {
+    if (token.sub) {
+        const user = await getUserById(token.sub);
+
+        if (user) {
+            token.role = user.role;
+        }
+    }
+
+    return token;
+};
+
+interface SessionCBProps {
+    token: JWT;
+    session: Session;
+}
+const sessionCB = async ({ token, session }: SessionCBProps) => {
+    if (token.sub && session.user) {
+        session.user.id = token.sub;
+    }
+
+    if (token.role && session.user) {
+        session.user.role = token.role as UserRole;
+    }
+
+    return session;
+};

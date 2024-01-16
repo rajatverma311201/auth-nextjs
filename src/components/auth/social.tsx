@@ -1,7 +1,10 @@
+"use client";
 import { useSearchParams } from "next/navigation";
 import { Button } from "../ui/button";
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
+import { signIn } from "next-auth/react";
+import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
 interface SocialProps {}
 
 export const Social: React.FC<SocialProps> = ({}) => {
@@ -10,9 +13,9 @@ export const Social: React.FC<SocialProps> = ({}) => {
 
     const clickHandler = (provider: "google" | "github") => {
         console.log("[Social]\n clickHandler() ");
-        //   signIn(provider, {
-        //     callbackUrl: callbackUrl || DEFAULT_LOGIN_REDIRECT,
-        //   });
+        signIn(provider, {
+            callbackUrl: callbackUrl || DEFAULT_LOGIN_REDIRECT,
+        });
     };
 
     return (

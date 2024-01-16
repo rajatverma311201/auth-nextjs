@@ -9,7 +9,7 @@ import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { LoginSchema } from "@/schemas";
+import { RegisterSchema } from "@/schemas";
 
 import { CardWrapper } from "@/components/auth/card-wrapper";
 import {
@@ -24,11 +24,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FormError } from "@/components/form-error";
 import { FormSuccess } from "@/components/form-success";
-import { login } from "@/actions/login";
+import { register } from "@/actions/register";
 
-interface LoginFormProps {}
+interface RegisterFormProps {}
 
-export const LoginForm: React.FC<LoginFormProps> = ({}) => {
+export const RegisterForm: React.FC<RegisterFormProps> = ({}) => {
     const searchParams = useSearchParams();
     const callbackUrl = searchParams.get("callbackUrl");
     const urlError =
@@ -43,21 +43,23 @@ export const LoginForm: React.FC<LoginFormProps> = ({}) => {
 
     const [isPending, startTransition] = useTransition();
 
-    const form = useForm<z.infer<typeof LoginSchema>>({
-        resolver: zodResolver(LoginSchema),
+    const form = useForm<z.infer<typeof RegisterSchema>>({
+        resolver: zodResolver(RegisterSchema),
         defaultValues: {
             email: "",
             password: "",
+            name: "",
         },
     });
 
-    const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
-        console.log("[LoginForm]\n onSubmit() ");
+    const onSubmit = async (values: z.infer<typeof RegisterSchema>) => {
+        console.log("[RegisterForm]\n onSubmit() ");
 
         startTransition(async () => {
-            const resp = await login({
+            const resp = await register({
                 email: values.email,
                 password: values.password,
+                name: values.name,
             });
             setError(resp.error);
             setSuccess(resp.success);
@@ -69,7 +71,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({}) => {
         //   signIn("credentials", {
         //     email: values.email,
         //     password: values.password,
-        //     callbackUrl: callbackUrl || DEFAULT_LOGIN_REDIRECT,
+        //     callbackUrl: callbackUrl || DEFAULT_REGISTER_REDIRECT,
         //     redirect: false,
         //   })
         //     .then(() => {
@@ -91,9 +93,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({}) => {
 
     return (
         <CardWrapper
-            headerLabel="Welcome back"
-            backButtonLabel="Don't have an account?"
-            backButtonHref="/auth/register"
+            headerLabel="Create an account"
+            backButtonLabel="Already have an account?"
+            backButtonHref="/auth/login"
             showSocial
         >
             <Form {...form}>
@@ -105,7 +107,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({}) => {
                         {showTwoFactor && (
                             <FormField
                                 control={form.control}
-                                name="code"
+                                name="name"
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Two Factor Code</FormLabel>
@@ -123,6 +125,23 @@ export const LoginForm: React.FC<LoginFormProps> = ({}) => {
                         )}
                         {!showTwoFactor && (
                             <>
+                                <FormField
+                                    control={form.control}
+                                    name="name"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Name</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    {...field}
+                                                    disabled={isPending}
+                                                    placeholder="John Doe"
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
                                 <FormField
                                     control={form.control}
                                     name="email"
@@ -180,7 +199,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({}) => {
                         type="submit"
                         className="w-full"
                     >
-                        {showTwoFactor ? "Confirm" : "Login"}
+                        {showTwoFactor ? "Confirm" : "Create an account"}
                     </Button>
                 </form>
             </Form>

@@ -5,6 +5,15 @@ class Mail {
 
     constructor(private readonly toEmail: string) {}
 
+    async sendPasswordResetEmail(token: string) {
+        const resetLink = `${this._domain}/auth/new-password?token=${token}`;
+
+        await this.sendMail(
+            "Reset your password",
+            `<p>Click <a href="${resetLink}">here</a> to reset your password.</p>`,
+        );
+    }
+
     async sendVerificationEmail(token: string) {
         const confirmLink = `${this._domain}/auth/new-verification?token=${token}`;
 

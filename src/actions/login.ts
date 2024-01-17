@@ -1,14 +1,18 @@
 "use server";
 
 import * as z from "zod";
-import { wait } from "@/lib/utils";
 import { LoginSchema } from "@/schemas";
 import { signIn } from "@/auth";
 import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
 import { AuthError } from "next-auth";
+import { getUserByEmail } from "@/data/user";
+import { generateVerificationToken } from "@/lib/tokens";
+import Mail from "@/lib/mail";
 
 export const login = async (data: z.infer<typeof LoginSchema>) => {
     const validatedFields = LoginSchema.safeParse(data);
+
+    console.log(process.env.APP_URL);
 
     if (!validatedFields.success) {
         // throw new Error(validatedFields.error.message);
@@ -16,6 +20,24 @@ export const login = async (data: z.infer<typeof LoginSchema>) => {
     }
 
     const { email, password } = validatedFields.data;
+
+    const existingUser = await getUserByEmail(email);
+
+    if (!existingUser || !existingUser.email || !existingUser.password) {
+        return { error: "Invalid Credentials" };
+    }
+
+    if (!existingUser.emailVerified) {
+        const verificationToken = await generateVerificationToken(
+            existingUser.email,
+        );
+
+        const mailService = new Mail(verificationToken.email);
+
+        await mailService.sendVerificationEmail(verificationToken.token);
+
+        return { success: "Confirmation email sent!" };
+    }
 
     try {
         await signIn("credentials", {

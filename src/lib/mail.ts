@@ -5,6 +5,10 @@ class Mail {
 
     constructor(private readonly toEmail: string) {}
 
+    async sendTwoFactorTokenEmail(token: string) {
+        await this.sendMail("2FA Code", `<p>Your 2FA code : ${token}</p>`);
+    }
+
     async sendPasswordResetEmail(token: string) {
         const resetLink = `${this._domain}/auth/new-password?token=${token}`;
 

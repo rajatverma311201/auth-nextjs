@@ -1,6 +1,12 @@
+import { NewPasswordForm } from "@/components/auth/new-password-form";
+
 interface NewPasswordPageProps {}
 
 const NewPasswordPage: React.FC<NewPasswordPageProps> = ({}) => {
-    return <h1>NewPasswordPage</h1>;
+    return (
+        <>
+            <NewPasswordForm />
+        </>
+    );
 };
 export default NewPasswordPage;

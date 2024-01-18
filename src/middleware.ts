@@ -18,7 +18,7 @@ import {
 const { auth } = NextAuth(authConfig);
 
 export default auth((req) => {
-    console.log("[middleware]");
+    console.log("[middleware]", req.nextUrl.pathname);
 
     const isLoggedIn = !!req.auth?.user;
 

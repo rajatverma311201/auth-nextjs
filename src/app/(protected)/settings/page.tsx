@@ -1,29 +1,30 @@
+"use client";
+import { logout } from "@/actions/logout";
 import { auth, signOut } from "@/auth";
 import { Button } from "@/components/ui/button";
+import { useUser } from "@/hooks/use-user";
 
 interface SettingsPageProps {}
 
-const SettingsPage: React.FC<SettingsPageProps> = async ({}) => {
-    const session = await auth();
-
+const SettingsPage: React.FC<SettingsPageProps> = ({}) => {
+    const user = useUser();
     // console.log(session?.user);
 
-    const handleLogout = async () => {
-        "use server";
-        await signOut({
-            redirectTo: "/auth/login",
-        });
+    const handleLogout = () => {
+        logout();
     };
 
     return (
         <>
             <h1>SettingsPage</h1>
 
-            <form action={handleLogout}>
-                <Button type="submit" variant={"destructive"}>
-                    Logout
-                </Button>
-            </form>
+            <Button
+                type="submit"
+                variant={"destructive"}
+                onClick={handleLogout}
+            >
+                Logout
+            </Button>
 
             {/* <pre>{JSON.stringify(session)}</pre> */}
         </>

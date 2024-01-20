@@ -125,19 +125,8 @@ export const login = async (data: z.infer<typeof LoginSchema>) => {
             // redirectTo: ,
         });
     } catch (error) {
-        console.log(error);
-        // console.log(
-        //     error.message,
-        //     error.type,
-        //     error instanceof AuthError, -> false
-        //     isRedirectError(error), -> true
-        // );
-
-        if (isRedirectError(error)) {
-            throw error;
-        }
-
         if (error instanceof AuthError) {
+            console.log("ERRRRROOOOOOORRRRRRRR TYPE", error.type);
             switch (error.type) {
                 case "CredentialsSignin":
                     return { error: "Invalid credentials!" };
@@ -147,6 +136,7 @@ export const login = async (data: z.infer<typeof LoginSchema>) => {
         }
 
         throw error;
+        // return;
     }
     return { success: "Email sent!" };
 };

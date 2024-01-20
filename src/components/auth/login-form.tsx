@@ -25,6 +25,8 @@ import { Button } from "@/components/ui/button";
 import { FormError } from "@/components/form-error";
 import { FormSuccess } from "@/components/form-success";
 import { login } from "@/actions/login";
+import { isRedirectError } from "next/dist/client/components/redirect";
+import { logger } from "@/actions/logger";
 
 interface LoginFormProps {}
 
@@ -68,44 +70,19 @@ export const LoginForm: React.FC<LoginFormProps> = ({}) => {
                 // setError(resp.error);
                 // setSuccess(resp.success);
 
-                if (resp.error) {
+                if (resp?.error) {
                     form.reset();
                     setError(resp.error);
-                } else if (resp.success) {
+                } else if (resp?.success) {
                     form.reset();
                     setSuccess(resp.success);
-                } else if (resp.twoFactor) {
+                } else if (resp?.twoFactor) {
                     setShowTwoFactor(true);
                 }
             } catch (err) {
                 setError("Something went wrong!");
             }
         });
-
-        // setError("");
-        // setSuccess("");
-        // startTransition(() => {
-        //   signIn("credentials", {
-        //     email: values.email,
-        //     password: values.password,
-        //     callbackUrl: callbackUrl || DEFAULT_LOGIN_REDIRECT,
-        //     redirect: false,
-        //   })
-        //     .then(() => {
-        //       setSuccess("Logged in successfully!");
-        //     })
-        //     .catch((error) => {
-        //       if (error instanceof CredentialsSignInError) {
-        //         if (error.twoFactorError) {
-        //           setShowTwoFactor(true);
-        //         } else {
-        //           setError("Invalid email or password!");
-        //         }
-        //       } else {
-        //         setError("Something went wrong!");
-        //       }
-        //     });
-        // });
     };
 
     return (

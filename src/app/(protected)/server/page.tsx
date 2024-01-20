@@ -1,10 +1,10 @@
 import { UserInfo } from "@/components/auth/user-info";
-import { currentUser } from "@/lib/auth";
+import { getUser } from "@/lib/auth";
 
 interface ServerPageProps {}
 
 const ServerPage: React.FC<ServerPageProps> = async ({}) => {
-    const user = await currentUser();
+    const user = await getUser();
     console.log(user);
     return (
         <>

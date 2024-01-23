@@ -1,5 +1,4 @@
 "use server";
-import { isRedirectError } from "next/dist/client/components/redirect";
 
 import * as z from "zod";
 import { LoginSchema } from "@/schemas";
@@ -17,7 +16,10 @@ import { getTwoFactorTokenByEmail } from "@/data/two-factor-token";
 import { db } from "@/lib/db";
 import { getTwoFactorConfirmationByUserId } from "@/data/two-factor-confirmation";
 
-export const login = async (data: z.infer<typeof LoginSchema>) => {
+export const login = async (
+    data: z.infer<typeof LoginSchema>,
+    callbackUrl: string | null,
+) => {
     const validatedFields = LoginSchema.safeParse(data);
 
     if (!validatedFields.success) {
@@ -121,7 +123,7 @@ export const login = async (data: z.infer<typeof LoginSchema>) => {
         await signIn("credentials", {
             email,
             password,
-            redirectTo: DEFAULT_LOGIN_REDIRECT,
+            redirectTo: callbackUrl || DEFAULT_LOGIN_REDIRECT,
             // redirectTo: ,
         });
     } catch (error) {

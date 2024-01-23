@@ -25,14 +25,13 @@ import { Button } from "@/components/ui/button";
 import { FormError } from "@/components/form-error";
 import { FormSuccess } from "@/components/form-success";
 import { login } from "@/actions/login";
-import { isRedirectError } from "next/dist/client/components/redirect";
-import { logger } from "@/actions/logger";
 
 interface LoginFormProps {}
 
 export const LoginForm: React.FC<LoginFormProps> = ({}) => {
     const searchParams = useSearchParams();
     const callbackUrl = searchParams.get("callbackUrl");
+
     const urlError =
         searchParams.get("error") === "OAuthAccountNotLinked"
             ? "Email already in use with a different provider!"
@@ -61,11 +60,14 @@ export const LoginForm: React.FC<LoginFormProps> = ({}) => {
 
         startTransition(async () => {
             try {
-                const resp = await login({
-                    email: values.email,
-                    password: values.password,
-                    code: values.code,
-                });
+                const resp = await login(
+                    {
+                        email: values.email,
+                        password: values.password,
+                        code: values.code,
+                    },
+                    callbackUrl,
+                );
 
                 // setError(resp.error);
                 // setSuccess(resp.success);
